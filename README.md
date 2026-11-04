@@ -4,6 +4,8 @@ Mapa local, em tempo real, dos agentes de IA rodando na sua máquina: **Claude C
 
 Tudo roda localmente: o daemon só escuta em `127.0.0.1`, lê arquivos que as próprias ferramentas já gravam em disco e não fala com nenhum serviço externo. Fontes, ícones e bibliotecas ficam todos no pacote, sem CDN.
 
+![Mapa dos agentes ativos, agrupados por projeto](docs/screenshots/mapa.png)
+
 ## Uso
 
 ```bash
@@ -29,6 +31,8 @@ Variáveis de ambiente:
 ## Arena (modo RPG)
 
 Clique em **⚔ Arena** na barra superior. Cada projeto (pasta onde a sessão começou) vira um **reino** com cenário, clima e boss próprios: Floresta Esmeralda, Masmorra Sombria, Dunas de Âmbar, Picos Congelados, Caldeira Ardente ou Planície Astral. O cenário é sorteado a partir do projeto e do nível do boss: **a cada boss derrotado, os heróis viajam para um cenário novo** (nunca o mesmo da vez anterior), com outro clima e outro boss. Como o sorteio é derivado do projeto + nível, ele é o mesmo depois de recarregar a página ou em outra máquina.
+
+![Arena no modo demonstração: um herói de cada classe enfrentando o Rei Slime](docs/screenshots/arena.png)
 
 A classe vem da **função** do agente; a ferramenta aparece no anel colorido sob os pés (laranja = Claude, azul = Codex, roxo = Cursor).
 
@@ -62,6 +66,8 @@ Tudo é desenhado no código (pixel art original, sem assets baixados) e renderi
 - **Personagem** = ferramenta + papel (`claude:main`, `codex:code_reviewer`…). O nível dele soma todas as sessões, de todo o histórico.
 - **Guilda** (botão 🏰 Guilda): nível geral, XP por dia, personagens, reinos (projetos) e totais de tokens.
 - Na Arena, cada herói mostra o nível do personagem e comemora com **LEVEL UP!** quando sobe.
+
+![Guilda: nível geral, totais de tokens e XP por dia](docs/screenshots/guilda.png)
 
 O daemon lê todo o histórico uma vez (cerca de 8 s para 1,5 GB) e guarda o progresso em `~/.config/agentmap/ledger.json`. Depois disso, só as linhas novas são processadas. Sessões cujas transcrições foram apagadas continuam contando.
 
