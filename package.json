@@ -1,0 +1,38 @@
+{
+  "name": "agentmap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mapa local dos agentes de IA (Claude Code, Codex, Cursor) rodando na máquina.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node daemon/src/main.ts",
+    "dev": "node --watch daemon/src/main.ts & vite --config web/vite.config.ts; kill %1",
+    "dev:daemon": "node --watch daemon/src/main.ts",
+    "dev:web": "vite --config web/vite.config.ts",
+    "build": "vite build --config web/vite.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "hook:install": "node scripts/claude-hook.mjs install",
+    "hook:uninstall": "node scripts/claude-hook.mjs uninstall",
+    "save:export": "node scripts/save.mjs export",
+    "save:import": "node scripts/save.mjs import"
+  },
+  "dependencies": {
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/ws": "^8.5.12",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@xyflow/react": "^12.12.0",
+    "phaser": "^4.2.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^5.9.0",
+    "vite": "^8.3.5"
+  }
+}
