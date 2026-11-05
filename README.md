@@ -32,18 +32,18 @@ Variáveis de ambiente:
 
 Clique em **⚔ Arena** na barra superior. Cada projeto (pasta onde a sessão começou) vira um **reino** com cenário, clima e boss próprios: Floresta Esmeralda, Masmorra Sombria, Dunas de Âmbar, Picos Congelados, Caldeira Ardente ou Planície Astral. O cenário é sorteado a partir do projeto e do nível do boss: **a cada boss derrotado, os heróis viajam para um cenário novo** (nunca o mesmo da vez anterior), com outro clima e outro boss. Como o sorteio é derivado do projeto + nível, ele é o mesmo depois de recarregar a página ou em outra máquina.
 
-![Arena no modo demonstração: um herói de cada classe enfrentando o Rei Slime](docs/screenshots/arena.png)
+![Arena 3D no modo demonstração: um herói de cada classe enfrentando o Lich Astral na Planície Astral](docs/screenshots/arena.png)
 
 A classe vem da **função** do agente; a ferramenta aparece no anel colorido sob os pés (laranja = Claude, azul = Codex, roxo = Cursor).
 
 | Classe | Quem vira | Ataque |
 |---|---|---|
-| 🛡️ Paladino | orquestradores, tech leads, gestores de entrega/projeto; sessão principal do Codex | espada + luz sagrada |
-| ⚔️ Guerreiro | desenvolvedores (backend, frontend, worker…) e papéis desconhecidos | investida com machado |
-| 🏹 Arqueiro | pesquisadores e exploradores; sessão principal do Cursor | flechas em arco |
+| 🛡️ Paladino | orquestradores, tech leads, gestores de entrega/projeto; sessão principal do Codex | espada + luz sagrada; bloqueia golpes com o escudo |
+| ⚔️ Guerreiro | desenvolvedores (backend, frontend, worker…) e papéis desconhecidos | machado de duas mãos, golpe giratório |
+| 🏹 Arqueiro | pesquisadores e exploradores; sessão principal do Cursor | virotes de besta |
 | 🧙 Mago | planejadores e arquitetos; sessão principal do Claude | bola de fogo |
-| 💀 Necromante | QA e testes | orbe sombrio |
-| 🗡️ Assassino | revisores, segurança, auditoria | teleporte + golpe duplo (às vezes crítico) |
+| 💀 Necromante | QA e testes | orbe sombrio, invocação |
+| 🗡️ Assassino | revisores, segurança, auditoria | avanço + golpe duplo (às vezes crítico); esquiva |
 
 As regras ficam em `web/src/classes.ts`. Abra `http://127.0.0.1:4317/?demo` para ver um herói de cada classe lutando.
 
@@ -135,7 +135,7 @@ Se o agentmap não estiver rodando, não houver aba aberta ou o tempo acabar, o 
 | Ferramenta | Fonte | Observações |
 |---|---|---|
 | Claude Code | `~/.claude/sessions/<pid>.json` (sessões vivas + status), `~/.claude/projects/*/<sessão>.jsonl` e `…/<sessão>/subagents/agent-*.jsonl` | o status vem do próprio Claude; subagentes são ligados ao pai pelo `toolUseId` |
-| Codex | `~/.codex/sessions/AAAA/MM/DD/rollout-*.jsonl`, `~/.codex/session_index.jsonl` | subagentes têm `parent_thread_id`; perguntas (`request_user_input`) aparecem como "esperando você" |
+| Codex | `~/.codex/sessions/AAAA/MM/DD/rollout-*.jsonl`, `~/.codex/session_index.jsonl`; para o XP, também `~/.codex/archived_sessions/*.jsonl.zst` | subagentes têm `parent_thread_id`; perguntas (`request_user_input`) aparecem como "esperando você" |
 | Cursor | `~/.cursor/projects/*/agent-transcripts/<id>/<id>.jsonl` | sem timestamps por linha; atividade estimada pelo mtime do arquivo |
 
 Esses formatos são internos e mudam entre versões. Cada fornecedor fica isolado em `daemon/src/collectors/`.
@@ -147,11 +147,12 @@ daemon/src/
   main.ts          HTTP + WebSocket (/ws), endpoint do hook, arquivos estáticos
   store.ts         modelo normalizado, derivação de status, aprovações pendentes
   jsonl.ts         leitura incremental de JSONL (só as linhas novas)
+  ledger.ts        XP: contagem de tokens de todo o histórico, save portátil e backups
   collectors/      claude.ts, codex.ts, cursor.ts
   types.ts         tipos compartilhados com a UI
 hooks/             hook PermissionRequest do Claude Code
-scripts/           instalador do hook
-web/src/           React + React Flow (mapa, caixa de entrada, painel de detalhes)
+scripts/           instalador do hook, exportar/importar save
+web/src/           React + React Flow (mapa, caixa de entrada, painel de detalhes, Guilda)
 web/src/arena/     componente React da Arena (reinos, abas, legenda)
 web/src/arena3d/   Arena 3D em Three.js: modelos KayKit, reinos, efeitos e combate
 web/public/models/ modelos KayKit (CC0)
