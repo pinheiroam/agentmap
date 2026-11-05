@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import * as Phaser from 'phaser';
 import type { Agent } from '../../../daemon/src/types.ts';
 import { CLASSES, classOf } from '../classes.ts';
 import { projectName } from '../format.ts';
 import { levelInfo } from '../levels.ts';
-import { ArenaScene, type ArenaData, type ArenaHero } from './ArenaScene.ts';
-import { biomeFor } from './biomes.ts';
+import { ArenaWorld, type ArenaData, type ArenaHero } from '../arena3d/ArenaWorld.ts';
+import { isLoaded, loadAssets } from '../arena3d/assets.ts';
+import { biomeFor } from '../arena3d/realms.ts';
 
 const MAX_HEROES = 40;
 /** http://127.0.0.1:4317/?demo coloca um herói de cada classe lutando, para ver todas as animações. */
@@ -52,7 +52,8 @@ function loadRealm() {
 
 export default function Arena({ visible, agents, selectedId, onSelect, levelOf, sessionXpOf, realmXpOf }: Props) {
   const host = useRef<HTMLDivElement>(null);
-  const scene = useRef<ArenaScene | null>(null);
+  const scene = useRef<ArenaWorld | null>(null);
+  const [loaded, setLoaded] = useState(isLoaded() ? 1 : 0);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const [chosen, setChosen] = useState<string | null>(loadRealm);
@@ -95,27 +96,27 @@ export default function Arena({ visible, agents, selectedId, onSelect, levelOf, 
     }
   }, [chosen]);
 
+  // Modelos 3D (KayKit) carregam uma vez; depois a cena é criada.
   useEffect(() => {
-    const el = host.current!;
-    const s = new ArenaScene({ onSelect: (id) => onSelectRef.current(id) });
-    const game = new Phaser.Game({
-      type: Phaser.AUTO,
-      parent: el,
-      pixelArt: true,
-      backgroundColor: '#05070f',
-      banner: false,
-      audio: { noAudio: true },
-      scale: { mode: Phaser.Scale.RESIZE, width: el.clientWidth, height: el.clientHeight },
-      scene: s,
-    });
-    scene.current = s;
-    // Só no modo demonstração: permite simular vitórias pelo console (window.__arena).
-    if (DEMO) (window as unknown as { __arena: ArenaScene }).__arena = s;
+    let alive = true;
+    loadAssets((p) => alive && setLoaded(p)).catch((err) => console.error('[arena] falha ao carregar modelos', err));
     return () => {
-      scene.current = null;
-      game.destroy(true);
+      alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (loaded < 1) return;
+    const world = new ArenaWorld(host.current!, { onSelect: (id) => onSelectRef.current(id) });
+    scene.current = world;
+    if (dataRef.current) world.setData(dataRef.current);
+    // Só no modo demonstração: permite simular vitórias pelo console (window.__arena).
+    if (DEMO) (window as unknown as { __arena: ArenaWorld }).__arena = world;
+    return () => {
+      scene.current = null;
+      world.dispose();
+    };
+  }, [loaded]);
 
   const data = useMemo<ArenaData | null>(() => {
     if (!realm) return null;
@@ -162,6 +163,8 @@ export default function Arena({ visible, agents, selectedId, onSelect, levelOf, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [realm, selectedId, levelOf, sessionXpOf, realmXpOf]);
 
+  const dataRef = useRef<ArenaData | null>(null);
+  dataRef.current = data;
   useEffect(() => {
     if (data) scene.current?.setData(data);
   }, [data]);
@@ -171,6 +174,14 @@ export default function Arena({ visible, agents, selectedId, onSelect, levelOf, 
   return (
     <div className="arena">
       <div className="arena__stage" ref={host} />
+      {loaded < 1 && (
+        <div className="arena__loading">
+          <span>Convocando os heróis…</span>
+          <div className="arena__loading-bar">
+            <i style={{ width: `${loaded * 100}%` }} />
+          </div>
+        </div>
+      )}
       {realms.length > 0 && (
         <div className="arena__realms">
           {realms.map((r) => {

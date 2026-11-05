@@ -54,9 +54,41 @@ As regras ficam em `web/src/classes.ts`. Abra `http://127.0.0.1:4317/?demo` para
 - **Boss = o projeto.** O nível do boss é o nível do reino (XP de todo o histórico do projeto), e a vida dele é o XP que falta para o projeto subir de nível. Quando o projeto sobe: **VITÓRIA!**, e surge o boss do nível seguinte.
 - **Dano real:** cada token novo de uma sessão vira dano no boss (`browser_batch -844`). Entre um ganho e outro, os heróis seguem atacando, mas esses golpes mostram só a ferramenta, sem número.
 - **Mana = janela de contexto da sessão.** A barra sob os pés do herói esvazia conforme o contexto enche (Codex: limite exato informado pelo próprio Codex; Claude: limite estimado, 200 mil ou 1 milhão conforme o uso já visto). Abaixo de 20% ela fica vermelha e piscando, e o herói ofega ("ufa…"). Quando a sessão é compactada e a mana volta, o herói **medita**. O mesmo dado aparece como "🔷 %" nos cards do mapa e no painel do agente.
-- **O boss ataca:** o Slime pula e solta uma onda de choque, o Dragão sopra fogo ou gelo na linha de frente, o Golem arremessa pedras e o Olho dispara um laser. O herói atingido fica atordoado por um instante; o Paladino pode bloquear com o escudo e o Assassino pode esquivar. Quanto maior o nível do projeto, mais rápido o boss ataca.
+- **O boss ataca** com os poderes do seu elemento (veja a tabela abaixo). Quanto maior o nível do projeto, mais rápido ele ataca.
 
-Tudo é desenhado no código (pixel art original, sem assets baixados) e renderizado com Phaser 4, carregado só quando a Arena é aberta.
+### Engine e modelos
+
+A Arena roda em **Three.js** (3D com luz e sombras dinâmicas, neblina, bloom e partículas), carregado só quando a Arena é aberta. Os personagens são modelos 3D animados do **KayKit** (Kay Lousberg, licença CC0), guardados em `web/public/models/kaykit/` e servidos localmente:
+
+| Classe | Modelo | Algumas animações |
+|---|---|---|
+| Paladino | Knight (espada + escudo) | golpes de espada, bloqueio |
+| Guerreiro | Barbarian (machado de duas mãos) | golpe giratório, corte, investida |
+| Arqueiro | Rogue (besta) | mirar, atirar, recarregar |
+| Mago | Mage (cajado) | conjurar e disparar bola de fogo |
+| Necromante | Skeleton_Mage (cajado de caveira) | orbe sombrio, invocação |
+| Assassino | Rogue_Hooded (duas facas) | avanço correndo, golpe duplo, esquiva |
+
+- **Ocioso:** senta no chão em volta da fogueira e levanta quando volta a trabalhar.
+- **Encerrado:** deita para dormir (zZ).
+- **Golpe do boss:** o herói cambaleia; o paladino bloqueia e o assassino esquiva.
+- **Level up:** o herói comemora.
+- **Bosses:** esqueletos gigantes do KayKit, com arma, cor e olhos próprios de cada reino. Quando derrotado, o boss desmorona numa pilha de ossos, e o próximo se ergue do chão no cenário novo.
+
+### Elementos dos bosses
+
+Cada boss tem um elemento com dois ataques próprios, e os golpes deixam efeitos de status nos heróis:
+
+| Boss | Elemento | Ataques | Efeito |
+|---|---|---|---|
+| Rei Esqueleto do Bosque | 🌿 Natureza | Raízes Espinhosas · Esporos Venenosos | enraizado (preso) · envenenado |
+| Sombra da Masmorra | 🌑 Sombra | Rajada Sombria · Véu das Trevas (a arena escurece) | amaldiçoado |
+| Faraó Esquecido | 🪨 Terra | Tempestade de Areia (tornado) · Terremoto | cegado · atordoado |
+| Rei do Inverno | ❄️ Gelo | Chuva de Estalactites · Nova Congelante | congelado (bloco de gelo, animação parada) |
+| Senhor das Brasas | 🔥 Fogo | Chuva de Meteoros · Erupção | queimando |
+| Lich Astral | ✨ Arcano | Corrente Arcana (salta entre heróis) · Singularidade (puxa e explode) | corrompido · atordoado |
+
+Enquanto dura o efeito, o herói não ataca. O paladino ainda pode bloquear e o assassino esquivar, e nesse caso não sofrem o efeito.
 
 ## Progressão e níveis
 
@@ -120,7 +152,9 @@ daemon/src/
 hooks/             hook PermissionRequest do Claude Code
 scripts/           instalador do hook
 web/src/           React + React Flow (mapa, caixa de entrada, painel de detalhes)
-web/src/arena/     Arena RPG em Phaser: pixel art, biomas, cena de combate
+web/src/arena/     componente React da Arena (reinos, abas, legenda)
+web/src/arena3d/   Arena 3D em Three.js: modelos KayKit, reinos, efeitos e combate
+web/public/models/ modelos KayKit (CC0)
 ```
 
 O daemon roda TypeScript direto pelo Node 22.18+ (type stripping), sem etapa de build.

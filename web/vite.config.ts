@@ -15,6 +15,6 @@ export default defineConfig({
       '/ws': { target: daemon, ws: true },
     },
   },
-  // O chunk do Phaser é grande, mas só carrega quando a Arena é aberta.
+  // O chunk da Arena (Three.js) é grande, mas só carrega quando a Arena é aberta.
   build: { outDir: 'dist', emptyOutDir: true, chunkSizeWarningLimit: 2000 },
 });

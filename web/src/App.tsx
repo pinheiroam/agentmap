@@ -12,7 +12,7 @@ import { useAgentmap } from './useAgentmap.ts';
 type Scope = 'active' | 'all';
 type View = 'map' | 'arena' | 'guild';
 
-// O Phaser só é baixado quando a Arena é aberta.
+// A engine 3D (Three.js) só é baixada quando a Arena é aberta.
 const Arena = lazy(() => import('./arena/Arena.tsx'));
 
 function load<T>(key: string, fallback: T): T {
