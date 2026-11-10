@@ -496,9 +496,13 @@ export class Fx {
 
 /** Texto que sobe e some (dano, "bloqueou!", "LEVEL UP!"). */
 export function floatText(parent: THREE.Object3D, at: THREE.Vector3, text: string, cls: string) {
+  // O CSS2DRenderer posiciona o elemento pelo `transform`; a animação (que também usa
+  // `transform`) fica num filho, senão o texto vai parar no canto da tela.
   const el = document.createElement('div');
-  el.className = `a3-float ${cls}`;
-  el.textContent = text;
+  const inner = document.createElement('div');
+  inner.className = `a3-float ${cls}`;
+  inner.textContent = text;
+  el.appendChild(inner);
   const obj = new CSS2DObject(el);
   obj.position.copy(at);
   parent.add(obj);

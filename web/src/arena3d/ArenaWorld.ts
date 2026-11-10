@@ -781,9 +781,12 @@ export class ArenaWorld {
     }
     const waiting = d.status === 'waiting';
     if (waiting && !h.bubble) {
+      // A animação fica no filho: o `transform` do wrapper é do CSS2DRenderer.
       const el = document.createElement('div');
-      el.className = 'a3-bubble';
-      el.textContent = '!';
+      const inner = document.createElement('div');
+      inner.className = 'a3-bubble';
+      inner.textContent = '!';
+      el.appendChild(inner);
       h.bubble = new CSS2DObject(el);
       h.bubble.position.set(0, h.actor.height + 1.05, 0);
       h.actor.root.add(h.bubble);
