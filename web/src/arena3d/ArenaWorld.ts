@@ -292,6 +292,8 @@ export class ArenaWorld {
     this.hemi.intensity = Math.max(1, b.hemi[2] * 1.4);
     this.sun.color.set(b.sun[0]);
     this.sun.intensity = b.sun[1];
+    this.renderer.toneMappingExposure = b.exposure ?? 1.05;
+    [this.bloom.strength, this.bloom.threshold] = b.bloom ?? [0.55, 0.82];
 
     const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 48), new THREE.MeshStandardMaterial({ color: b.ground, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2;

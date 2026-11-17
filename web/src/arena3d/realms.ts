@@ -36,6 +36,10 @@ export interface Biome {
   arena: number;
   hemi: [number, number, number];
   sun: [number, number];
+  /** Exposição do tone mapping (padrão 1.05). Cenários claros (neve) precisam de menos. */
+  exposure?: number;
+  /** Bloom [força, limiar] (padrão [0.55, 0.82]). Superfícies muito claras acima do limiar viram névoa branca. */
+  bloom?: [number, number];
   /** Monta o cenário. r() é determinístico por reino. */
   build: (g: THREE.Group, r: () => number, lights: THREE.PointLight[]) => void;
   /** Clima, chamado a cada quadro. */
@@ -233,11 +237,14 @@ export const BIOMES: Biome[] = [
       element: 'ice',
     },
     sky: ['#86c4ee', '#eef8ff'],
-    fog: 0xe4f2fb,
-    ground: 0xeaf3fb,
-    arena: 0xdbe9f5,
-    hemi: [0xe6f6ff, 0x8aa6c0, 1.2],
-    sun: [0xffffff, 2.4],
+    fog: 0xd4e6f3,
+    ground: 0xc9d9e8,
+    arena: 0xb8cde0,
+    hemi: [0xe6f6ff, 0x6f8aa6, 0.75],
+    sun: [0xfff6e8, 1.7],
+    // A neve reflete muita luz: com o bloom padrão a tela inteira vira névoa branca.
+    exposure: 0.85,
+    bloom: [0.35, 2.4],
     build(g, r) {
       for (let i = 0; i < 7; i++) {
         const [x, z] = around(r, 22, 32);
