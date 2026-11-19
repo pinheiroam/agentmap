@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import type { Agent, AgentStatus, Provider } from '../../daemon/src/types.ts';
-import { AgentMap } from './AgentMap.tsx';
+import { AgentMap, type MapMode } from './AgentMap.tsx';
 import { ApprovalCard } from './Approvals.tsx';
 import { Detail } from './Detail.tsx';
 import { Guild } from './Guild.tsx';
@@ -50,6 +50,7 @@ export function App() {
   const [focusId, setFocusId] = useState<string | null>(null);
   const [scope, setScope] = useState<Scope>(() => load('scope', 'active'));
   const [view, setView] = useState<View>(() => load('view', 'map'));
+  const [mapMode, setMapMode] = useState<MapMode>(() => load('mapMode', 'tree'));
   const [providers, setProviders] = useState<Provider[]>(() => load('providers', ['claude', 'codex', 'cursor']));
   const [query, setQuery] = useState('');
   const [now, setNow] = useState(Date.now());
@@ -60,6 +61,7 @@ export function App() {
   }, []);
   useEffect(() => save('scope', scope), [scope]);
   useEffect(() => save('view', view), [view]);
+  useEffect(() => save('mapMode', mapMode), [mapMode]);
   useEffect(() => save('providers', providers), [providers]);
   useEffect(() => subscribe(selectedId), [selectedId, subscribe]);
   useEffect(() => {
@@ -166,6 +168,16 @@ export function App() {
               🏰 Guilda
             </button>
           </div>
+          {view === 'map' && (
+            <div className="seg" title="Como agrupar os agentes no mapa">
+              <button className={mapMode === 'tree' ? 'is-on' : ''} onClick={() => setMapMode('tree')}>
+                Projetos
+              </button>
+              <button className={mapMode === 'worktrees' ? 'is-on' : ''} onClick={() => setMapMode('worktrees')}>
+                ⑂ Worktrees
+              </button>
+            </div>
+          )}
           <div className="seg">
             <button className={scope === 'active' ? 'is-on' : ''} onClick={() => setScope('active')}>
               Ativos
@@ -270,6 +282,7 @@ export function App() {
               focusId={focusId}
               now={now}
               sessionXp={sessionXp}
+              mode={mapMode}
               onSelect={setSelectedId}
             />
           </ReactFlowProvider>

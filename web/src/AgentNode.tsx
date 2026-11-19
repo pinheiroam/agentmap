@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type CSSProperties } from 'react';
 import { Handle, Position, type Node, type NodeProps } from '@xyflow/react';
 import type { Agent } from '../../daemon/src/types.ts';
 import { PROVIDERS, STATUS, ago, modelName } from './format.ts';
@@ -65,6 +65,43 @@ export const ProjectNode = memo(function ProjectNode({ data }: NodeProps<Node<Pr
         {data.total}
       </span>
       <Handle type="source" position={Position.Right} />
+    </div>
+  );
+});
+
+export type WorktreeNodeData = {
+  /** Repositório (ou pasta, sem git). */
+  name: string;
+  /** Nome da worktree ligada (`git worktree add`); ausente na worktree principal. */
+  worktree?: string;
+  branch?: string;
+  path: string;
+  git: boolean;
+  hue: number;
+  counts: { working: number; waiting: number; total: number };
+};
+
+/** Quadrante da visão por worktrees: moldura com cabeçalho; os agentes ficam por cima. */
+export const WorktreeNode = memo(function WorktreeNode({ data }: NodeProps<Node<WorktreeNodeData>>) {
+  const { counts } = data;
+  return (
+    <div className={`wt${data.git ? '' : ' wt--nogit'}`} style={{ '--wt-hue': data.hue } as CSSProperties}>
+      <header className="wt__head" title={data.path}>
+        <div className="wt__title">
+          <span className="wt__repo">{data.git ? '⎇' : '📁'} {data.name}</span>
+          {data.worktree ? <span className="wt__tag">worktree · {data.worktree}</span> : data.git && <span className="wt__tag wt__tag--main">principal</span>}
+          {!data.git && <span className="wt__tag">sem git</span>}
+          <span className="wt__counts">
+            {counts.waiting > 0 && <span className="wt__n wt__n--waiting">{counts.waiting} esperando</span>}
+            {counts.working > 0 && <span className="wt__n wt__n--working">{counts.working} trabalhando</span>}
+            <span className="wt__n">{counts.total} agente{counts.total === 1 ? '' : 's'}</span>
+          </span>
+        </div>
+        <div className="wt__sub">
+          {data.branch && <code className="wt__branch">{data.branch}</code>}
+          <span className="wt__path">{data.path}</span>
+        </div>
+      </header>
     </div>
   );
 });

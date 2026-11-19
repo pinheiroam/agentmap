@@ -168,11 +168,13 @@ export class CodexCollector {
             ev({ ts: t, kind: 'question', label: 'request_user_input', text: questionText(args) });
           } else {
             ev({ ts: t, kind: 'tool', label: p.name, text: summarizeArgs(p.name, args) });
+            this.store.touch(id, args);
           }
           break;
         }
         case 'custom_tool_call':
           ev({ ts: t, kind: 'tool', label: p.name, text: summarizeExec(p.input ?? '') });
+          this.store.touch(id, p.input ?? '');
           break;
         case 'function_call_output':
         case 'custom_tool_call_output': {

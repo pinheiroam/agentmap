@@ -508,6 +508,112 @@ pre {
   font-weight: 400;
 }
 
+/* quadrantes da visão por worktrees */
+.react-flow__node-worktree {
+  pointer-events: none;
+}
+.wt {
+  --wt-accent: hsl(var(--wt-hue) 70% 60%);
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--wt-accent) 38%, var(--line-2));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--wt-accent) 12%, transparent), transparent 120px),
+    color-mix(in srgb, var(--panel-solid) 55%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--wt-accent) 25%, transparent);
+}
+.wt--nogit {
+  --wt-accent: var(--text-3);
+  border-style: dashed;
+}
+.wt__head {
+  pointer-events: auto;
+  display: grid;
+  gap: 6px;
+  padding: 14px 20px 0;
+}
+.wt__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.wt__repo {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.wt__tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--wt-accent) 80%, var(--text));
+  background: color-mix(in srgb, var(--wt-accent) 16%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.wt__tag--main {
+  color: var(--text-2);
+  background: color-mix(in srgb, var(--text-3) 14%, transparent);
+}
+.wt__counts {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.wt__n {
+  font-size: 11.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.wt__n--working {
+  color: var(--working);
+  font-weight: 600;
+}
+.wt__n--waiting {
+  color: var(--waiting);
+  font-weight: 600;
+}
+.wt__sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.wt__branch {
+  font: 600 12px var(--mono);
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
+.wt__branch::before {
+  content: '⑂ ';
+  color: var(--wt-accent);
+}
+.wt__path {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.edge--cross .react-flow__edge-path {
+  stroke-dasharray: 2 6;
+  opacity: 0.55;
+}
+.mm--worktree {
+  fill: color-mix(in srgb, var(--line-2) 50%, transparent);
+}
+
 /* edges */
 .react-flow__edge-path {
   stroke: var(--line-2);

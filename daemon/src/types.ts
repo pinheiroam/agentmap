@@ -28,6 +28,19 @@ export interface Agent {
   resume?: string;
   /** Janela de contexto: tokens em uso no último turno e limite do modelo. */
   context?: { used: number; limit: number; estimated: boolean };
+  /** Worktree git onde o agente está trabalhando (pelas pastas que as ferramentas tocam). */
+  worktree?: Worktree;
+}
+
+export interface Worktree {
+  /** Pasta da worktree (contém `.git`); sem git, a pasta da sessão. */
+  root: string;
+  /** Repositório principal ao qual a worktree pertence. */
+  repo: string;
+  branch?: string;
+  /** true para worktrees criadas com `git worktree add`. */
+  linked: boolean;
+  git: boolean;
 }
 
 export type EventKind = 'user' | 'assistant' | 'tool' | 'result' | 'question' | 'system';

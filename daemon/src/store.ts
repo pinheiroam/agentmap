@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { config } from './config.ts';
 import type { Agent, AgentEvent, AgentStatus, Approval, Decision } from './types.ts';
+import { gitRoot, pathsFromInput, pickWorktree } from './worktree.ts';
 
 /** Sinais que os coletores fornecem para derivar o status. */
 export interface StatusHints {
@@ -20,6 +21,8 @@ interface Entry {
   agent: Agent;
   hints: StatusHints;
   events: AgentEvent[];
+  /** Raízes git das últimas pastas tocadas pelas ferramentas (mais recente no fim). */
+  roots: string[];
 }
 
 interface PendingApproval {
@@ -59,6 +62,7 @@ export class Store extends EventEmitter {
         },
         hints: {},
         events: [],
+        roots: [],
       };
       this.entries.set(id, e);
     }
@@ -86,6 +90,18 @@ export class Store extends EventEmitter {
     this.newEvents.set(id, pending);
   }
 
+  /** Registra as pastas que uma chamada de ferramenta tocou (para achar a worktree). */
+  touch(id: string, input: unknown) {
+    const e = this.entries.get(id);
+    if (!e) return;
+    for (const p of pathsFromInput(input)) {
+      const root = gitRoot(p);
+      if (!root) continue;
+      e.roots.push(root);
+      if (e.roots.length > 30) e.roots.shift();
+    }
+  }
+
   events(id: string) {
     return this.entries.get(id)?.events ?? [];
   }
@@ -105,6 +121,7 @@ export class Store extends EventEmitter {
     const changed: Agent[] = [];
     for (const e of this.entries.values()) {
       e.agent.status = deriveStatus(e, now, waitingAgents.has(e.agent.id));
+      e.agent.worktree = pickWorktree(e.roots, e.agent.cwd);
       const json = JSON.stringify(e.agent);
       if (this.sent.get(e.agent.id) !== json) {
         this.sent.set(e.agent.id, json);

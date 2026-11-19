@@ -6,6 +6,8 @@ Tudo roda localmente: o daemon só escuta em `127.0.0.1`, lê arquivos que as pr
 
 ![Mapa dos agentes ativos, agrupados por projeto](docs/screenshots/mapa.png)
 
+No mapa, o seletor **Projetos | ⑂ Worktrees** muda o agrupamento. Em **Worktrees**, cada quadrante é uma worktree git (repositório, branch e se é a principal ou uma `git worktree add`), com os agentes que trabalham nela. A worktree de cada agente vem das pastas que as ferramentas dele tocam (`workdir` do Codex, arquivos e `cd` do Claude), não só da pasta onde a sessão começou; subagentes em outra worktree ficam no quadrante dela, ligados ao pai por uma linha tracejada.
+
 ## Uso
 
 ```bash

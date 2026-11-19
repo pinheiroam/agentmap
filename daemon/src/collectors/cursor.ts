@@ -77,6 +77,7 @@ export class CursorCollector {
           events.push({ id: `${id}#${ctx.seq++}`, ts: now(), kind: 'assistant', text: clip(b.text) });
         } else if (b.type === 'tool_use') {
           const input = b.input ?? {};
+          this.store.touch(id, input);
           const text = input.command ?? input.path ?? input.file_path ?? (summarizeTool(b.name, input) || stringify(input, 400));
           events.push({ id: `${id}#${ctx.seq++}`, ts: now(), kind: 'tool', label: b.name, text });
         }

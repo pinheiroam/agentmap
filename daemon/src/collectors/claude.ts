@@ -184,6 +184,7 @@ export class ClaudeCollector {
           if (b.type === 'text' && b.text?.trim()) ev({ ts: t, kind: 'assistant', text: clip(b.text) });
           else if (b.type === 'tool_use') {
             this.toolOwner.set(b.id, id);
+            this.store.touch(id, b.input);
             const question = b.name === 'AskUserQuestion';
             ev({
               ts: t,
